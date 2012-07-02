@@ -14,7 +14,7 @@ class Collection extends \ArrayObject {
      * Instantiate a new Story Board collection
      * @param array $storyBoards    Initial Story Boards
      */
-    public function __construct(array $storyBoards) {
+    public function __construct(array $storyBoards = array()) {
         
         parent::__construct($storyBoards);
     }
@@ -27,8 +27,25 @@ class Collection extends \ArrayObject {
      */
     public function addStoryBoard(StoryBoard $storyBoard) {
         
-        $this->offsetSet(null, $storyBoard);
+        $this->offsetSet($storyBoard->getId(), $storyBoard);
         return $this;
+    }
+    
+    /**
+     * Retrieve a Story Board by ID
+     * 
+     * @param mixed $id
+     * @return \Magma\PlanningPoker\Story\Board
+     */
+    public function getStoryBoard($id) {
+        
+        $retval = null;
+        
+        if ($this->offsetExists($id)) {
+            $retval = $this[$id];
+        }
+        
+        return $retval;
     }
     
     /**
@@ -48,9 +65,13 @@ class Collection extends \ArrayObject {
         return $this;
     }
     
-    public function offsetSet($index, StoryBoard $board) {
+    public function offsetSet($offset, $value) {
         
-        parent::offsetSet($index, $board);
+        if (!($value instanceof StoryBoard)) {
+            throw new \InvalidArgumentException('$value must be an instance of \Magma\PlanningPoker\Story\Board');
+        }
+        
+        parent::offsetSet($offset, $value);
     }
     
     /**
@@ -63,6 +84,10 @@ class Collection extends \ArrayObject {
         return $this;
     }
     
+    /**
+     * Retrieve only active boards
+     * @return \Magma\PlanningPoker\Story\Board\self 
+     */
     public function getActive() {
         
         $retval = array();
@@ -76,5 +101,16 @@ class Collection extends \ArrayObject {
         }
         
         return new self($boards);
+    }
+    
+    public function toArray() {
+        
+        $retval = array();
+        
+        foreach ($this->getAll() as $board) {
+            $retval[] = $board->toArray();
+        }
+        
+        return $retval;
     }
 }

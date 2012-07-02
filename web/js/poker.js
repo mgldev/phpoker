@@ -33,13 +33,7 @@ var Poker = new Class({
 
     onopen: function() {
 
-		var request = {
-            action: 'join',
-            params: { username: this.username }
-        };
-
-        this.connection.send(JSON.encode(request));
-		$.mobile.changePage('#main', { transition: "slideup" });
+        this.action('join', { username: this.username });
     },
 
     onmessage: function(evt) {
@@ -48,30 +42,52 @@ var Poker = new Class({
 
 		switch (response.action) {
 
-			case 'member-list':
-				this.members = response.params.members;
-				this.refreshMemberList();
+			case 'board-list':
+				this.boards = response.params.boards;
+				this.refreshBoardList();
+                $.mobile.changePage('#boards', { transition: "slideup" });
 				break;
-
-			case 'new-member':
-				this.members.include(response.params.member);
-				this.refreshMemberList();
+            
+            case 'show-board':
+                $.mobile.changePage('#board', { transition: "slideup" });
+                break;
 		}
+    },
+    
+    action: function(action, params) {
+      
+      var request = {
+          action: action,
+          params: params
+      };
+      
+      this.connection.send(JSON.encode(request));
     },
 
     onclose: function() {
 
-        this.setConnectedStatus(false);
 		$.mobile.changePage('#connect', { transition: "slideup" });
     },
 
-	refreshMemberList: function() {
+	refreshBoardList: function() {
 
-		$('#member-list').empty();
+		$('#board-list').empty();
 
-		for (var i = 0; i < this.members.length; i++) {
-			var member = this.members[i];
-			$('#member-list').append('<li>' + member.displayName + '</li>');
+		for (var i = 0; i < this.boards.length; i++) {
+			var board = this.boards[i];
+            var innerHtml = board.name;
+            var theme = '';
+            if (board.active) {
+                theme = ' data-theme="b"';
+                var board_id = 'board-' + board.id;
+                innerHtml = '<a id="' + board_id + '" href="#' + board.id + '" title="Join ' + board.name + '">' + board.name + '</a>';
+                $('#' + board_id).live('click', function(ev) {
+                    ev.preventDefault();
+                    this.action('join-board', { board: board.id });
+                }.bind(this));
+            }
+            var item = '<li ' + theme + '>' + innerHtml + '</li>';
+			$('#board-list').append(item);
 		}
 	},
 
