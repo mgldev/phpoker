@@ -1,0 +1,44 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
+        <link rel="stylesheet" type="text/css" href="/css/style.css" />
+        <script type="text/javascript" src="/js/mootools-core-1.4.5-full-nocompat.js"></script>
+        <script type="text/javascript" src="/js/jquery.min.js"></script>
+        <script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
+        <script type="text/javascript" src="/js/poker.js"></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>phpoker - Planning Poker</title>
+    </head>
+    <body>
+
+		<div id="connect" data-role="page" data-theme="a">
+
+			<div id="header" data-role="header" role="banner">
+				<h2 role="heading">Planning Poker</h2>
+			</div>
+
+			<div data-role="content" role="main">
+				<label for="username" for="username">Username</label>
+				<input type="text" id="username" />
+				<a href="#" id="join" data-role="button" data-theme="a">Join</a>
+			</div>
+
+		</div>
+
+		<div id="main" data-role="page" data-theme="a">
+
+			<div id="header" data-role="header" role="banner">
+				<h2 role="heading">Planning Poker</h2>
+			</div>
+
+			<div data-role="content" role="main">
+				<ul id="member-list" data-role="listview" data-inset="true">
+				</ul>
+			</div>
+
+		</div>
+
+    </body>
+</html>
