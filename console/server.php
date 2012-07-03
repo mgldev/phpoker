@@ -8,14 +8,14 @@ $loader->register();
 
 use Ratchet\Server\IoServer;
 use Ratchet\WebSocket\WsServer;
-use Magma\PlanningPoker\WebSocket\Poker as PlanningPoker;
+use Magma\PlanningPoker\WebSocket\PlanningPoker;
 use Magma\PlanningPoker\Story;
 use Magma\PlanningPoker\Story\Board as StoryBoard;
 use Magma\PlanningPoker\Story\Board\Collection as StoryBoardCollection;
 
 /**
  * simply building story boards / stories by hand until
- * mechanism built for retrieving / injecting 
+ * mechanism built for retrieving / injecting
  */
 $board1 = new StoryBoard('Planning Poker');
 $board1->addStory(new Story('Perform initial testing of Web Sockets', 'Get a working example of web sockets up and running'));

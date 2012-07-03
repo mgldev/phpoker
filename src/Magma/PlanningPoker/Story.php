@@ -3,7 +3,8 @@
 namespace Magma\PlanningPoker;
 
 /**
- * Description of Story
+ * Represents a story which contains a name, description
+ * and a collection of estimates from members
  *
  * @author michael
  */

@@ -13,56 +13,57 @@
     </head>
     <body>
 
-		<div id="connect" data-role="page" data-theme="a">
+        <!-- Connection screen (join) -->
+        <div id="connect" data-role="page" data-theme="a">
 
-			<div id="header" data-role="header" role="banner">
-				<h2 role="heading">Planning Poker</h2>
-			</div>
+            <div id="header" data-role="header" role="banner">
+                <h2 role="heading">Planning Poker</h2>
+            </div>
 
-			<div data-role="content" role="main">
-				<label for="username" for="username">Username</label>
-				<input type="text" id="username" />
-				<a href="#" id="join" data-role="button" data-theme="a">Join</a>
-			</div>
+            <div data-role="content" role="main">
+                <label for="username" for="username">Username</label>
+                <input type="text" id="username" />
+                <a href="#" id="join" data-role="button" data-theme="a">Join</a>
+            </div>
+        </div>
 
-		</div>
+        <!-- Show board selection -->
+        <div id="boards" data-role="page" data-theme="a">
 
-		<div id="boards" data-role="page" data-theme="a">
+            <div id="header" data-role="header" role="banner">
+                <h2 role="heading">Planning Poker</h2>
+            </div>
 
-			<div id="header" data-role="header" role="banner">
-				<h2 role="heading">Planning Poker</h2>
-			</div>
-
-			<div data-role="content" role="main">
+            <div data-role="content" role="main">
                 <h2>Story boards</h2>
                 <p>Select a board to join:</p>
-				<ul id="board-list" data-role="listview" data-inset="true">
-				</ul>
-			</div>
+                <ul id="board-list" data-role="listview" data-inset="true">
+                </ul>
+            </div>
+        </div>
 
-		</div>
-        
-        <div id="board" data-role="page" data-theme="a">
+        <!-- Show current story to be estimated -->
+        <div id="current-story" data-role="page" data-theme="a">
 
-			<div id="header" data-role="header" role="banner">
-				<h2 id="board-name" role="heading">Planning Poker</h2>
-			</div>
+            <div id="header" data-role="header" role="banner">
+                <h2 id="board-name" role="heading">Planning Poker</h2>
+            </div>
 
-			<div data-role="content" role="main">
+            <div data-role="content" role="main">
 
                 <h2 id="board-name"></h2>
-                
+
                 <p id="position">Story <strong class="index">1</strong> of <strong class="count">22</strong></p>
-                
+
                 <div data-role="collapsible-set">
                     <div data-role="collapsible">
                         <h3>Perform initial testing of Web Sockets</h3>
                         <p>Get a working example of web sockets up and running</p>
                     </div>
                 </div>
-                
+
                 <p>Select estimate:</p>
-                
+
                 <ul id="board-list" data-role="listview" data-inset="true">
                     <li><a href="#" rel="0.25">1/4 day</a>
                     <li><a href="#" rel="0.25">1/2 day</a>
@@ -72,21 +73,18 @@
                     <li><a href="#" rel="0.25">1 1/2 days</a>
                     <li><a href="#" rel="0.25">1 3/4 days</a>
                     <li><a href="#" rel="0.25">2 days</a>
-				</ul>
-                
+                </ul>
+
                 <p>Members</p>
-                
+
                 <ul id="board-list" data-role="listview" data-inset="true">
                     <li>Michael</li>
                     <li>Alan</li>
                     <li>Adrian</li>
                     <li>Jeremy</li>
                     <li>Mark</li>
-				</ul>
-                
-			</div>
-
-		</div>
-
+                </ul>
+            </div>
+        </div>
     </body>
 </html>

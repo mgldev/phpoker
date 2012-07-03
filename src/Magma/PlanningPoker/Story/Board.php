@@ -14,6 +14,7 @@ class Board {
     protected $_name = null;
     protected $_active = false;
     protected $_stories = null;
+    protected $_members = null;
     
     public function __construct($name, $id = null, array $stories = array()) {
         
@@ -24,6 +25,25 @@ class Board {
         $this->setId($id)
                 ->setName($name)
                 ->setStories($stories);
+        
+        $this->setMembers(new \SplObjectStorage);
+    }
+    
+    public function setMembers(\SplObjectStorage $members) {
+        
+        $this->_members = $members;
+        return $this;
+    }
+    
+    public function getMembers() {
+        
+        return $this->_members;
+    }
+    
+    public function addMember(\Magma\PlanningPoker\Member $member) {
+        
+        $this->getMembers()->attach($member);
+        return $this;
     }
     
     public function setId($id) {
