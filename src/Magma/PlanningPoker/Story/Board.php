@@ -1,6 +1,7 @@
 <?php
 
 namespace Magma\PlanningPoker\Story;
+use Magma\PlanningPoker\Member;
 use Magma\PlanningPoker\Story;
 
 /**
@@ -14,7 +15,12 @@ class Board {
     protected $_name = null;
     protected $_active = false;
     protected $_stories = null;
+
+    /**
+     * @var Member[]
+     */
     protected $_members = null;
+    protected $_position = 0;
     
     public function __construct($name, $id = null, array $stories = array()) {
         
@@ -29,25 +35,73 @@ class Board {
         $this->setMembers(new \SplObjectStorage);
     }
 
+    /**
+     * @return Story
+     */
     public function getCurrentStory() {
 
-        return reset($this->_stories);
+        return $this->_stories[$this->getStoryPosition()];
     }
-    
+
+    public function getStoryPosition() {
+
+        return $this->_position;
+    }
+
+    public function getStoryCount() {
+
+        return count($this->_stories);
+    }
+
+    public function nextStory() {
+
+        if (!(($this->_position + 1) > $this->getStoryCount())) {
+            $this->_position++;
+        }
+
+        return $this->getCurrentStory();
+    }
+
+    public function previousStory() {
+
+        if (!(($this->_position - 1) < 0)) {
+            $this->_position--;
+        }
+
+        return $this->getCurrentStory();
+    }
+
+    /**
+     * @param \SplObjectStorage $members
+     * @return $this
+     */
     public function setMembers(\SplObjectStorage $members) {
         
         $this->_members = $members;
         return $this;
     }
-    
+
+    /**
+     * @return Member[]
+     */
     public function getMembers() {
         
         return $this->_members;
     }
-    
-    public function addMember(\Magma\PlanningPoker\Member $member) {
+
+    /**
+     * @param Member $member
+     * @return $this
+     */
+    public function addMember(Member $member) {
         
         $this->getMembers()->attach($member);
+        return $this;
+    }
+
+    public function removeMember(Member $member) {
+
+        $this->getMembers()->detach($member);
         return $this;
     }
     
@@ -110,9 +164,23 @@ class Board {
         $retval = array(
             'id' => $this->getId(),
             'name' => $this->getName(),
-            'active' => $this->isActive()
+            'active' => $this->isActive(),
+            'story_count' => $this->getStoryCount(),
+            'story_position' => $this->getStoryPosition() + 1,
+            'members' => $this->getMemberArray()
         );
         
+        return $retval;
+    }
+
+    public function getMemberArray() {
+
+        $retval = array();
+
+        foreach (clone $this->getMembers() as $member) {
+            $retval[] = $member->toArray();
+        }
+
         return $retval;
     }
 }

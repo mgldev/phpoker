@@ -3,6 +3,7 @@
 namespace Magma\PlanningPoker;
 
 use Magma\PlanningPoker\Story\Board as StoryBoard;
+use Magma\PlanningPoker\Story\Board;
 
 /**
  * A member (participant) of Planning Poker
@@ -13,6 +14,10 @@ class Member {
 
 	protected $_username = null;
 	protected $_displayName = null;
+
+    /**
+     * @var Board
+     */
     protected $_board = null;
 
 	public function setUsername($username) {
@@ -36,20 +41,21 @@ class Member {
 
 		return $this->_displayName;
 	}
-    
-    public function joinBoard(\Magma\PlanningPoker\Story\Board $board) {
-        
-        $this->setCurrentStoryBoard($board);
-        $this->getCurrentStoryBoard()->addMember($this);
-        return $this;
-    }
-    
-    public function setCurrentStoryBoard(\Magma\PlanningPoker\Story\Board $board) {
-        
+
+    /**
+     * @param StoryBoard $board
+     * @return $this
+     */
+    public function joinBoard(Board $board) {
+
         $this->_board = $board;
+        $this->_board->addMember($this);
         return $this;
     }
-    
+
+    /**
+     * @return Board
+     */
     public function getCurrentStoryBoard() {
         
         return $this->_board;
@@ -64,7 +70,7 @@ class Member {
      */
     public function estimateCurrentStory($estimate) {
         
-        $board = $this->getStoryBoard();
+        $board = $this->getCurrentStoryBoard();
         
         if (is_null($board)) {
             throw new \DomainException('Member has not joined a board');

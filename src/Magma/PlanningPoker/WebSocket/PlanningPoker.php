@@ -2,12 +2,14 @@
 
 namespace Magma\PlanningPoker\WebSocket;
 
+use Magma\PlanningPoker\Story\Board;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 use Magma\PlanningPoker\Member;
 use Magma\PlanningPoker\Story\Board as StoryBoard;
 use Magma\PlanningPoker\Story\Board\Collection as StoryBoardCollection;
 use Magma\PlanningPoker\WebSocket\PlanningPoker\Core;
+use Ratchet\WebSocket\Version\Hixie76\Connection;
 
 /**
  * Web Sockets Planning Poker
@@ -49,28 +51,56 @@ class PlanningPoker extends Core {
      * Join a story board
      * 
      * @param ConnectionInterface $conn
-     * @param type $boardId 
+     * @param string $boardId
      */
     public function joinBoard(ConnectionInterface $conn, $boardId) {
 
         // retrieve story board and add new member
         $board = $this->getStoryBoards()->getStoryBoard($boardId);
-        $member = $this->getMemberByConnection($conn);
-        $member->joinBoard($board);
+        $newMember = $this->getMemberByConnection($conn);
+        $newMember->joinBoard($board);
 
         // notify board members of new member
         foreach ($board->getMembers() as $member) {
-
-            $conn = $this->getConnectionByMember($member);
-            $params = array('member' => $member->toArray());
-            $this->action($conn, 'board-member-join', $params);
+            $notifyConn = $this->getConnectionByMember($member);
+            $params = array('members' => $board->getMemberArray());
+            $this->action($notifyConn, 'refresh-board-members', $params);
         }
+
+        $this->showCurrentStoryForBoard($conn, $board);
+        return $this;
+    }
+
+    /**
+     * @param ConnectionInterface $conn
+     */
+    public function leave(ConnectionInterface $conn) {
+
+        $member = $this->getMemberByConnection($conn);
+
+        $board = $member->getCurrentStoryBoard();
+        $board->removeMember($member);
+
+        foreach ($board->getMembers() as $member) {
+            // notify board members of member leaving
+            $notifyConn = $this->getConnectionByMember($member);
+            $params = array('members' => $board->getMemberArray());
+            $this->action($notifyConn, 'refresh-board-members', $params);
+        }
+
+        $this->getMembers()->detach($conn);
+    }
+
+    protected function showCurrentStoryForBoard(ConnectionInterface $conn, Board $board) {
 
         // show the current story being estimated on this board
         $story = $board->getCurrentStory();
-        $params = array('story' => $story->toArray());
+        $params = array(
+            'story' => $story->toArray(),
+            'board' => $board->toArray()
+        );
+
         $this->action($conn, 'show-current-story', $params);
-        
         return $this;
     }
 
@@ -92,7 +122,7 @@ class PlanningPoker extends Core {
      * Set the estimate for the current story
      *
      * @param ConnectionInterface $conn
-     * @param type $estimate
+     * @param float $estimate
      */
     public function estimateCurrentStory(ConnectionInterface $conn, $estimate) {
 
@@ -145,7 +175,7 @@ class PlanningPoker extends Core {
         $params = array('story' => $story->toArray());
         
         foreach ($board->getMembers() as $member) {
-            $connection = $this->getConnectByMember($member);
+            $connection = $this->getConnectionByMember($member);
             $this->action($connection, 'show-current-story', $params);
         }
         
@@ -188,6 +218,7 @@ class PlanningPoker extends Core {
 
     public function onOpen(ConnectionInterface $conn) {
 
+        $this->debug($conn, 'NEW_CONNECTION');
         $this->getMembers()->attach($conn);
     }
 
@@ -198,7 +229,7 @@ class PlanningPoker extends Core {
      */
     public function onClose(ConnectionInterface $conn) {
 
-        $this->getMembers()->detach($conn);
+        $this->leave($conn);
     }
 
     /**
@@ -211,5 +242,4 @@ class PlanningPoker extends Core {
 
         error_log((string) $e);
     }
-
 }

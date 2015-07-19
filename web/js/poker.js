@@ -5,10 +5,7 @@
  */
 var Poker = new Class({
 
-    boards: [],
-    currentStory: null,
     connection: null,
-    members: [],
 
     Implements: [Options, Events],
 
@@ -52,19 +49,21 @@ var Poker = new Class({
         switch (response.action) {
 
             case 'board-list':
-                this.boards = response.params.boards;
-                this.refreshBoardList();
                 $.mobile.changePage('#boards', {
                     transition: "slideup"
                 });
+                this.refreshBoardList(response.params.boards);
+                break;
+
+            case 'refresh-board-members':
+                this.refreshMemberList(response.params.members);
                 break;
 
             case 'show-current-story':
-                this.currentStory = response.params.story;
-                this.refreshCurrentStory();
                 $.mobile.changePage('#current-story', {
                     transition: "slideup"
                 });
+                this.refreshCurrentStory(response.params.story, response.params.board);
                 break;
         }
     },
@@ -86,24 +85,50 @@ var Poker = new Class({
         });
     },
     
-    refreshCurrentStory: function() {
-        
-        
+    refreshCurrentStory: function(story, board) {
+
+        var storyName = $('#story-name');
+        storyName.find('span.ui-btn-text').html(story.name);
+        $('#story-description').html(story.description);
+        var storyPosition = $('#story-position');
+        storyPosition.find('strong.index').html(board.story_position);
+        storyPosition.find('strong.count').html(board.story_count);
+
+        this.refreshMemberList(board.members);
     },
 
-    refreshBoardList: function() {
+    refreshMemberList: function(members) {
 
-        $('#board-list').empty();
+        var memberList = $('ul.board-member-list');
 
-        for (var i = 0; i < this.boards.length; i++) {
-            var board = this.boards[i];
+        memberList.empty();
+
+        for (var i = 0; i < members.length; i++) {
+            var member = members[i];
+            var innerHtml = member.displayName;
+            var theme = '';
+            var item = '<li ' + theme + '><a href="#">' + innerHtml + '</a></li>';
+            memberList.append(item);
+        }
+
+        memberList.listview();
+        memberList.listview('refresh');
+    },
+
+    refreshBoardList: function(boards) {
+
+        var boardList = $('#board-list');
+        boardList.empty();
+
+        for (var i = 0; i < boards.length; i++) {
+            var board = boards[i];
             var innerHtml = board.name;
             var theme = '';
             if (board.active) {
                 theme = ' data-theme="b"';
                 var board_id = 'board-' + board.id;
                 innerHtml = '<a id="' + board_id + '" href="#' + board.id + '" title="Join ' + board.name + '">' + board.name + '</a>';
-                $('#' + board_id).live('click', function(ev) {
+                $('#' + board_id).die('click').live('click', function(ev) {
                     ev.preventDefault();
                     this.action('join-board', {
                         board: board.id
@@ -111,8 +136,11 @@ var Poker = new Class({
                 }.bind(this));
             }
             var item = '<li ' + theme + '>' + innerHtml + '</li>';
-            $('#board-list').append(item);
+            boardList.append(item);
         }
+
+        boardList.listview();
+        boardList.listview('refresh');
     },
 
     onerror: function(error) {
@@ -135,10 +163,10 @@ $(document).ready(function() {
     var poker = new Poker();
 
     $('#join').click(function() {
-        if (poker.isConnected()) {
-            poker.leave();
-        } else {
-            poker.join($('#username').val());
-        }
+        poker.join($('#username').val());
     });
+
+    $('a.leave-button').click(function() {
+        poker.leave();
+    })
 });

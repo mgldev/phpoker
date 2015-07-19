@@ -2,6 +2,8 @@
 
 namespace Magma\PlanningPoker\WebSocket\PlanningPoker;
 
+use Magma\PlanningPoker\Member;
+use Magma\PlanningPoker\Story\Board\Collection;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
@@ -20,9 +22,9 @@ abstract class Core implements MessageComponentInterface {
 
     /**
      * Collection of Story Boards
-     * @var StoryBoardCollection
+     * @var Collection
      */
-    protected $_boards = null;
+    protected $_storyBoards = null;
 
     public function __construct() {
 
@@ -63,7 +65,7 @@ abstract class Core implements MessageComponentInterface {
      * @param Member $member
      * @return ConnectionInterface
      */
-    protected function getConnectionByMember(\Magma\PlanningPoker\Member $member) {
+    protected function getConnectionByMember(Member $member) {
 
         $retval = null;
 
@@ -80,10 +82,10 @@ abstract class Core implements MessageComponentInterface {
     /**
      * Set story board collection
      *
-     * @param StoryBoardCollection $storyBoards
+     * @param Collection $storyBoards
      * @return \Magma\PlanningPoker\WebSocket\Poker
      */
-    public function setStoryBoards(\Magma\PlanningPoker\Story\Board\Collection $storyBoards) {
+    public function setStoryBoards(Collection $storyBoards) {
 
         $this->_storyBoards = $storyBoards;
         return $this;
@@ -92,7 +94,7 @@ abstract class Core implements MessageComponentInterface {
     /**
      * Retrieve story board collection
      *
-     * @return StoryBoardCollection
+     * @return Collection
      */
     public function getStoryBoards() {
 
@@ -110,7 +112,25 @@ abstract class Core implements MessageComponentInterface {
     public function action(ConnectionInterface $conn, $action, $params) {
 
         $response = array('action' => $action, 'params' => $params);
-        $conn->send(json_encode($response));
+        $response = json_encode($response);
+        $conn->send($response);
         return $this;
+    }
+
+    /**
+     * @param ConnectionInterface $conn
+     * @param $action
+     * @param string $message
+     */
+    public function debug(ConnectionInterface $conn, $action, $message = '') {
+
+        $member = $this->getMemberByConnection($conn);
+
+        $name = '';
+        if ($member) {
+            $name = '[' . $member->getDisplayName() . ']';
+        }
+
+        print('[' . date('d/m/Y H:i:s', time()) . '] ' . $name . ' [' . $action . '] ' . $message . "\n");
     }
 }
