@@ -56,4 +56,14 @@ class Story {
         
         return $this->_estimates;
     }
+
+    public function toArray() {
+
+        $retval = array(
+            'name' => $this->getName(),
+            'description' => $this->getDescription()
+        );
+
+        return $retval;
+    }
 }

@@ -1,8 +1,13 @@
 {
 	"require": {
 		"silex/silex": "1.0.*",
-		"cboden/Ratchet": "dev-master",
 		"twig/twig": ">=1.8,<2.0-dev",
-		"symfony/twig-bridge": "2.1.*"
+		"symfony/twig-bridge": "2.1.*",
+		"cboden/ratchet": "0.3.*"
+	},
+	"autoload": {
+	  "psr-4": {
+		"": "src/"
+	  }
 	}
 }

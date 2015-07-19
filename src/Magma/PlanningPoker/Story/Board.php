@@ -28,6 +28,11 @@ class Board {
         
         $this->setMembers(new \SplObjectStorage);
     }
+
+    public function getCurrentStory() {
+
+        return reset($this->_stories);
+    }
     
     public function setMembers(\SplObjectStorage $members) {
         
@@ -70,7 +75,7 @@ class Board {
     
     public function addStory(Story $story) {
         
-        $this->_stories = $story;
+        $this->_stories[] = $story;
         return $this;
     }
     
@@ -81,8 +86,11 @@ class Board {
     }
     
     public function setStories(array $stories) {
-        
-        $this->_stories = $stories;
+
+        foreach ($stories as $story) {
+            $this->addStory($story);
+        }
+
         return $this;
     }
     
