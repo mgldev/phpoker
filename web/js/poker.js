@@ -15,7 +15,7 @@ var Poker = new Class({
     join: function(username) {
 
         this.username = username;
-        this.connection = new WebSocket("ws://192.168.1.100:8000");
+        this.connection = new WebSocket("ws://127.0.0.1:8000");
         this.wireConnectionEvents();
     },
 
