@@ -44,12 +44,21 @@ class Story {
     
     public function addEstimate(Member $member, $estimate) {
         
-        if (!is_float($estimate)) {
+        if (!is_numeric($estimate)) {
             throw new \InvalidArgumentException('$estimate must be a float');
         }
         
-        $this->getEstimates()->attach($member, $estimate);
+        $this->getEstimates()->attach($member, (float) $estimate);
         return $this;
+    }
+
+    /**
+     * @param Member $member
+     * @return bool
+     */
+    public function hasEstimateFrom(Member $member) {
+
+        return $this->getEstimates()->contains($member);
     }
     
     public function getEstimates() {

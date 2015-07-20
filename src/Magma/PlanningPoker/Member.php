@@ -12,6 +12,7 @@ use Magma\PlanningPoker\Story\Board;
  */
 class Member {
 
+    protected $_id = null;
 	protected $_username = null;
 	protected $_displayName = null;
 
@@ -19,6 +20,20 @@ class Member {
      * @var Board
      */
     protected $_board = null;
+
+    public function __construct($id = null) {
+
+        if (is_null($id)) {
+            $id = uniqid();
+        }
+
+        $this->_id = $id;
+    }
+
+    public function getId() {
+
+        return $this->_id;
+    }
 
 	public function setUsername($username) {
 
@@ -83,14 +98,23 @@ class Member {
         }
         
         $story->addEstimate($this, $estimate);
+        var_dump('estimate added');
         return $this;
+    }
+
+    public function hasEstimatedCurrentStory() {
+
+        $board = $this->getCurrentStoryBoard();
+        return $board && $board->getCurrentStory() && $board->getCurrentStory()->hasEstimateFrom($this);
     }
 
 	public function toArray() {
 
 		$retval = array(
+            'id' => $this->_id,
 			'username' => $this->_username,
-			'displayName' => $this->_displayName
+			'displayName' => $this->_displayName,
+            'estimated' => $this->hasEstimatedCurrentStory()
 		);
 
 		return $retval;

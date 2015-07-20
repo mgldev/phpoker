@@ -42,9 +42,16 @@ class PlanningPoker extends Core {
                 ->setDisplayName(ucwords(str_replace('_', ' ', $username)));
 
         $this->getMembers()->attach($conn, $member);
+        $this->sendRegistered($conn, $member);
         $this->sendBoardList($conn);
         
         return $this;
+    }
+
+    public function sendRegistered(ConnectionInterface $conn, Member $member) {
+
+        $params = array('member' => $member->toArray());
+        $this->action($conn, 'registered', $params);
     }
 
     /**
@@ -78,8 +85,9 @@ class PlanningPoker extends Core {
 
         $member = $this->getMemberByConnection($conn);
 
-        $board = $member->getCurrentStoryBoard();
-        $board->removeMember($member);
+        if ($board = $member->getCurrentStoryBoard()) {
+            $board->removeMember($member);
+        }
 
         foreach ($board->getMembers() as $member) {
             // notify board members of member leaving
@@ -127,15 +135,16 @@ class PlanningPoker extends Core {
     public function estimateCurrentStory(ConnectionInterface $conn, $estimate) {
 
         $member = $this->getMemberByConnection($conn);
+        $board = $member->getCurrentStoryBoard();
         $member->estimateCurrentStory($estimate);
 
-        foreach ($member->getCurrentStoryBoard()->getMembers() as $member) {
-
-            $connection = $this->getConnectionByMember($member);
-            if ($connection === $conn)
+        foreach ($board->getMembers() as $member) {
+            $notifyConn = $this->getConnectionByMember($member);
+            if ($notifyConn === $conn) {
                 continue;
-            $params = array('member' => $member->toArray());
-            $this->action($connection, 'member-voted', $params);
+            }
+            $params = array('members' => $board->getMemberArray());
+            $this->action($notifyConn, 'refresh-board-members', $params);
         }
         
         return $this;
@@ -218,7 +227,6 @@ class PlanningPoker extends Core {
 
     public function onOpen(ConnectionInterface $conn) {
 
-        $this->debug($conn, 'NEW_CONNECTION');
         $this->getMembers()->attach($conn);
     }
 

@@ -7,6 +7,8 @@ var Poker = new Class({
 
     connection: null,
 
+    me: null,
+
     Implements: [Options, Events],
 
     join: function(username) {
@@ -47,6 +49,10 @@ var Poker = new Class({
         var response = JSON.decode(evt.data);
 
         switch (response.action) {
+
+            case 'registered':
+                this.me = response.params.member;
+                break;
 
             case 'board-list':
                 $.mobile.changePage('#boards', {
@@ -94,6 +100,21 @@ var Poker = new Class({
         storyPosition.find('strong.index').html(board.story_position);
         storyPosition.find('strong.count').html(board.story_count);
 
+        var estimateList = $('#estimate-list');
+
+        var self= this;
+        estimateList.find('a').die('click').live('click', function(e) {
+
+            $(this).closest('li').attr('data-theme', 'b');
+            estimateList.listview();
+            estimateList.listview('refresh');
+
+            var estimate = $(this).data('estimate');
+            self.action('estimate', {
+                estimate: estimate
+            });
+        });
+
         this.refreshMemberList(board.members);
     },
 
@@ -104,9 +125,18 @@ var Poker = new Class({
         memberList.empty();
 
         for (var i = 0; i < members.length; i++) {
+
             var member = members[i];
+            if (member.id == this.me.id) {
+               continue;
+            }
             var innerHtml = member.displayName;
             var theme = '';
+
+            if (member.estimated) {
+                theme = ' data-theme="b"';
+            }
+
             var item = '<li ' + theme + '><a href="#">' + innerHtml + '</a></li>';
             memberList.append(item);
         }
@@ -146,15 +176,6 @@ var Poker = new Class({
     onerror: function(error) {
 
         alert('WebSocket Error ' + error);
-    },
-
-    setConnectedStatus: function(connected) {
-
-        if (connected) {
-            $('#join').find('.ui-btn-text').text('Leave');
-        } else {
-            $('#join').find('.ui-btn-text').text('Join');
-        }
     }
 });
 
